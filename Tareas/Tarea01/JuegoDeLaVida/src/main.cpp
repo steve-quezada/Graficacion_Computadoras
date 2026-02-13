@@ -6,10 +6,20 @@
 #include <chrono>
 #include <thread>
 
+#ifdef _WIN32
+	#include <windows.h>
+#endif
+
 void calculaEstadosFuturos(const std::vector<Celula*>& celulas);
 
 int main()
 {
+	// Configurar salida estándar para UTF-8 en Windows
+	#ifdef _WIN32
+		SetConsoleCP(65001);
+		SetConsoleOutputCP(65001);
+	#endif
+
 	// Se crea la ventana de la aplicación
 	sf::RenderWindow window( sf::VideoMode( { 504, 504 } ), "Juego de la vida" );
 
@@ -128,5 +138,38 @@ int main()
  */
 void calculaEstadosFuturos(const std::vector<Celula*>& celulas)
 {
-	//TODO
+	const int size = 5;
+	for (int index = 0; index < static_cast<int>(celulas.size()); ++index)
+	{
+		int fila = index / size;
+		int columna = index % size;
+		int vecinos = 0;
+
+		if (fila > 0 && columna > 0 && celulas.at((fila - 1) * size + (columna - 1))->isViva())
+			++vecinos;
+		if (fila > 0 && celulas.at((fila - 1) * size + columna)->isViva())
+			++vecinos;
+		if (fila > 0 && columna < size - 1 && celulas.at((fila - 1) * size + (columna + 1))->isViva())
+			++vecinos;
+		if (columna > 0 && celulas.at(fila * size + (columna - 1))->isViva())
+			++vecinos;
+		if (columna < size - 1 && celulas.at(fila * size + (columna + 1))->isViva())
+			++vecinos;
+		if (fila < size - 1 && columna > 0 && celulas.at((fila + 1) * size + (columna - 1))->isViva())
+			++vecinos;
+		if (fila < size - 1 && celulas.at((fila + 1) * size + columna)->isViva())
+			++vecinos;
+		if (fila < size - 1 && columna < size - 1 && celulas.at((fila + 1) * size + (columna + 1))->isViva())
+			++vecinos;
+
+		bool viva = celulas.at(index)->isViva();
+		if (viva)
+		{
+			celulas.at(index)->setEstadoFuturo(vecinos == 2 || vecinos == 3);
+		}
+		else
+		{
+			celulas.at(index)->setEstadoFuturo(vecinos == 3);
+		}
+	}
 }

@@ -7,22 +7,21 @@ sf::RectangleShape& Celula::getCuadrado()
 
 void Celula::cambiaEstado()
 {
-    //TODO
+    m_estado = !m_estado;
+    m_cuadrado.setFillColor(m_estado ? sf::Color::White : sf::Color::Black);
 }
 
 bool Celula::isViva()
 {
-    //TODO
-    return false;
+    return m_estado;
 }
 
 void Celula::setEstadoFuturo(bool estado)
 {
-    //TODO
+    m_estadoFuturo = estado;
 }
 
 bool Celula::getEstadoFuturo()
 {
-    //TODO
-    return false;
+    return m_estadoFuturo;
 }
