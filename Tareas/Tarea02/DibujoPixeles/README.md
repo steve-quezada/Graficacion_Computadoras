@@ -137,6 +137,29 @@ cmake --build .
 - Archivo: `desmos_michi.js`
 
 - Captura (Desmos):
-
 	![Michi en Desmos](desmos/SS-desmos.png)
+
 ---
+
+## Capturas de ejecución
+
+### P1 — Windows
+**Descripción:** Ejecución en Windows (generada en `build-windows`).
+
+<p align="center">
+	<img src="media/P1.png" alt="P1 - Windows" />
+</p>
+
+### P0 — Original
+**Descripción:** Imagen original.
+
+<p align="center">
+	<img src="media/P0.png" alt="P0 - Original" />
+</p>
+
+### P1-P0-P1 — Muestra
+**Descripción:** Generado en Windows (P1), Original (P0), Generado en WSL (P1)
+
+<p align="center">
+	<img src="media/P1-P0-P1.png" alt="P1-P0-P1 - Muestra" />
+</p>
