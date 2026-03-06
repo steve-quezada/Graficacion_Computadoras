@@ -31,11 +31,13 @@ void Game::Update(){
         // Cambio de movimiento con teclado
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)){
             for(auto& enemy : m_enemies){
+                enemy.setSpeed(enemy.lerpSpeed);
                 enemy.ChangeMovement(enemy.lerpMovement);
             }
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)){
             for(auto& enemy : m_enemies){
+                enemy.setSpeed(enemy.directSpeed);
                 enemy.ChangeMovement(enemy.directMovement);
             }
         }

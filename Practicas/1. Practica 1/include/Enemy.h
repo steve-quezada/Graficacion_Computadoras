@@ -25,6 +25,9 @@ public:
     LerpMovement lerpMovement {}; // Movimiento suave y desacelerado
     DirectMovement directMovement {}; // Movimiento lineal constante
 
+    float lerpSpeed   = 2.0f;    // velocidad para LerpMovement
+    float directSpeed = 75.0f;   // velocidad para DirectMovement
+
     /**
      * @brief Constructor del enemigo.
      * @param target Referencia a la posición del jugador/objetivo.

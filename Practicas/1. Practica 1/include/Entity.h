@@ -63,6 +63,8 @@ public:
     
     // Versión const para lectura segura de la posición
     const math::linear::Vector2D& getPosition()const;
+
+    void setSpeed(float s) { m_speed = s; }
 };
 
 
