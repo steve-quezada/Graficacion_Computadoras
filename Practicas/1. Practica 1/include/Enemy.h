@@ -25,8 +25,14 @@ public:
     LerpMovement lerpMovement {}; // Movimiento suave y desacelerado
     DirectMovement directMovement {}; // Movimiento lineal constante
 
-    float lerpSpeed   = 2.0f;    // velocidad para LerpMovement
+    float lerpSpeed   = 1.0f;    // velocidad para LerpMovement
     float directSpeed = 75.0f;   // velocidad para DirectMovement
+
+    sf::Color lerpColor   = sf::Color(255, 200, 80);
+    sf::Color directColor = sf::Color(100, 0, 150);
+
+    void setSpeed(float s) { m_speed = s; }
+    void setColor(sf::Color c) { m_shape.setFillColor(c); }
 
     /**
      * @brief Constructor del enemigo.

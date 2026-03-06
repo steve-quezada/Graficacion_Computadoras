@@ -4,6 +4,7 @@ Enemy::Enemy(sf::Color color, float radius, float x, float y, float speed, math:
     : Entity(color, radius, x, y, speed), // Inicializa la clase padre
       m_target(target)                 // Inicializa la referencia al target
 {
+    m_currentMovement = &directMovement;
 }
 
 void Enemy::ComputeMovement(float deltaTime){

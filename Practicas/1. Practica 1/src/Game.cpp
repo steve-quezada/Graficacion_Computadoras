@@ -32,12 +32,14 @@ void Game::Update(){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)){
             for(auto& enemy : m_enemies){
                 enemy.setSpeed(enemy.lerpSpeed);
+                enemy.setColor(enemy.lerpColor);
                 enemy.ChangeMovement(enemy.lerpMovement);
             }
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)){
             for(auto& enemy : m_enemies){
                 enemy.setSpeed(enemy.directSpeed);
+                enemy.setColor(enemy.directColor);
                 enemy.ChangeMovement(enemy.directMovement);
             }
         }
