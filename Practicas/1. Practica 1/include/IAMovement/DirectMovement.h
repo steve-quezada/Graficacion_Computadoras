@@ -28,8 +28,11 @@ public:
     void Move(  math::linear::Vector2D& pos, 
                 const math::linear::Vector2D& target, 
                 float speed, 
-                float dt) override; 
-                // Tu codigo va aquí :)  o en un .cpp 
+                float dt) override {
+        direction = target - pos;
+        direction = math::linear::Normalize(direction);
+        pos += direction * speed * dt;
+    }
 
 };
 

@@ -21,8 +21,11 @@ class LerpMovement: public IMovementBehavior{
     void Move( math::linear::Vector2D& pos, 
                 const math::linear::Vector2D& target, 
                 float speed, 
-                float dt) override;
-                // Tu codigo va aquí :)  o en un .cpp 
+                float dt) override {
+        float t = speed * dt;
+        pos.x = math::functions::Lerp(pos.x, target.x, t);
+        pos.y = math::functions::Lerp(pos.y, target.y, t);
+    }
 
 };
 
