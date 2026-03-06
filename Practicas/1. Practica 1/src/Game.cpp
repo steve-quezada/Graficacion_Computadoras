@@ -28,17 +28,33 @@ void Game::Update(){
             }
         }
         
+        // Cambio de movimiento con teclado
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)){
+            for(auto& enemy : m_enemies){
+                enemy.ChangeMovement(enemy.lerpMovement);
+            }
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)){
+            for(auto& enemy : m_enemies){
+                enemy.ChangeMovement(enemy.directMovement);
+            }
+        }
+
         // -> Actualizacion jugador
         m_player.Update(m_deltaTime);
 
         // Actualizacion cada enemigo 
-        // // Tu codigo va aquí :)
+        for(auto& enemy : m_enemies){
+            enemy.Update(m_deltaTime);
+        }
         
         m_window.clear(sf::Color::Black);
         m_window.draw(m_player.getDrawable());
 
         // Renderizado por cada enemigo 
-        // // Tu codigo va aquí :)
+        for(auto& enemy : m_enemies){
+            m_window.draw(enemy.getDrawable());
+        }
         
         m_window.display();
     }

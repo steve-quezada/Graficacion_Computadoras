@@ -16,9 +16,8 @@
 
     void Entity::ComputeMovement(float deltaTime){
         if(math::linear::Magnitude(m_direction) >0){
-            // Modifica la posicion
-            // // Tu codigo va aquí :)     
-            // Se actualiza la representacion visual 
+            m_position += math::linear::Normalize(m_direction) * m_speed * deltaTime;
+            m_shape.setPosition(m_position.x, m_position.y);
         }
     }
 

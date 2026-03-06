@@ -7,14 +7,16 @@ Enemy::Enemy(sf::Color color, float radius, float x, float y, float speed, math:
 }
 
 void Enemy::ComputeMovement(float deltaTime){
-    // Tu codigo va aquí :)     
+    if(m_currentMovement != nullptr){
+        m_currentMovement->Move(m_position, m_target, m_speed, deltaTime);
+    }
 }
 
 void Enemy::Update(float deltaTime){
-    
-    // Tu codigo va aquí :)     
+    ComputeMovement(deltaTime);
+    m_shape.setPosition(m_position.x, m_position.y);
 }
 
 void Enemy::ChangeMovement(IMovementBehavior& newMovement){
-    // Tu codigo va aquí :)     
+    m_currentMovement = &newMovement;
 }
