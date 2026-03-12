@@ -37,11 +37,12 @@
 │   └── Polygon.cpp               ← VAO + VBO
 │
 ├── media/
-│   ├── Set-Of-Tangram.jpg            ← Referencia: opciones de gato tangram
-│   ├── Tangram-Cat.jpg               ← Referencia: tangram elegido
-│   └── Desmos-Tangram-Cat.png        ← Captura del proceso en Desmos
+│   ├── Set-Of-Tangram.jpg        ← Referencia: opciones de gato tangram
+│   ├── Tangram-Cat.jpg           ← Referencia: tangram elegido
+│   ├── Desmos-Tangram-Cat.png    ← Captura del proceso en Desmos
+│   └── OpenGL-Tangram-Cat.png    ← Resultado final en OpenGL
 │
-└── build-wsl/                    ← (Generado) Binarios
+└── build/                        ← (Generado) Binarios
     └── opengl_intro
 ```
 
@@ -85,17 +86,13 @@ La silueta del gato está construida con **7 triángulos**:
 ## Referencia
 
 <div align="center">
-
-![Set de tangrams](media/Set-Of-Tangram.jpg)
-
+<img src="media/Set-Of-Tangram.jpg" width="400"/>
 </div>
 
 Se eligió esta figura:
 
 <div align="center">
-
-![Tangram elegido](media/Tangram-Cat.jpg)
-
+<img src="media/Tangram-Cat.jpg" width="200"/>
 </div>
 
 ---
@@ -105,9 +102,7 @@ Se eligió esta figura:
 Las coordenadas se obtuvieron con [Desmos Graphing Calculator](https://www.desmos.com/calculator/ggumupgo3j?lang=es):
 
 <div align="center">
-
-![Proceso en Desmos](media/Desmos-Tangram-Cat.png)
-
+<img src="media/Desmos-Tangram-Cat.png" width="500"/>
 </div>
 
 ---
@@ -115,7 +110,5 @@ Las coordenadas se obtuvieron con [Desmos Graphing Calculator](https://www.desmo
 ## Resultado Final
 
 <div align="center">
-
-![Tangram OpenGL](media/OpenGL-Tangram-Cat.png)
-
+<img src="media/OpenGL-Tangram-Cat.png" width="500"/>
 </div>
