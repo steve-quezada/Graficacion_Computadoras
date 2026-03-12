@@ -20,7 +20,12 @@ find_package(glfw3 REQUIRED)
 
 
 # Ejecutable
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp)
+add_executable(${PROJECT_NAME}
+    ${PROJECT_SOURCE_DIR}/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/ShaderProgram.cpp
+    ${PROJECT_SOURCE_DIR}/src/Polygon.cpp
+    ${PROJECT_SOURCE_DIR}/src/Window.cpp
+)
 
 # Librerías
 # Linkear las bibliotecas encontradas
@@ -28,4 +33,11 @@ target_link_libraries(${PROJECT_NAME}
     OpenGL::GL
     GLEW::GLEW
     glfw
+)
+
+# Copiar carpeta shaders al directorio del ejecutable
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/shaders
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
 )

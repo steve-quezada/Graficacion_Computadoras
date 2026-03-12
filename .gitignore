@@ -63,8 +63,10 @@ Thumbs.db
 Practicas/0. Pruebas
 Proyectos/
 
-Tareas/Tarea01/JuegoDeLaVida/build-wsl
-Tareas/Tarea01/JuegoDeLaVida/build-linux
-Tareas/Tarea01/JuegoDeLaVida/build-macos
+# Builds
+Tareas/**/build*
+Practicas/**/build*
 
-Practicas/1. Practica 1/build*
+# Latex
+Tareas/**/Latex
+Practicas/**/Latex
