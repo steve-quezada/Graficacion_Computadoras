@@ -3,11 +3,12 @@
 #include <GL/glew.h>
 #include <string>
 
-class ShaderProgram {
+class ShaderProgram
+{
 public:
     unsigned int shaderProgram;
 
-    ShaderProgram(const std::string& vertPath, const std::string& fragPath);
+    ShaderProgram(const std::string &vertPath, const std::string &fragPath);
     void use();
     ~ShaderProgram();
 };

@@ -3,9 +3,10 @@
 #pragma once
 #include <GL/glew.h>
 
-class Polygon {
+class Polygon
+{
 public:
-    Polygon(const float* vertices, int vertexCount); // Crea VAO y VBO
+    Polygon(const float *vertices, int vertexCount); // Crea VAO y VBO
     void draw();
     ~Polygon();
 

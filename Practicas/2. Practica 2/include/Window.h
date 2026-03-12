@@ -10,8 +10,8 @@ public:
     GLFWwindow *handle; // Puntero que representa la ventana
 
     Window(int width, int height, const char *title);
-    bool shouldClose();                               
-    void swapBuffers();                               
-    void pollEvents();                                
-    ~Window();                                        
+    bool shouldClose();
+    void swapBuffers();
+    void pollEvents();
+    ~Window();
 };
