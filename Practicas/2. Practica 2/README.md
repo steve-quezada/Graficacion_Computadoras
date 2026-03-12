@@ -1,50 +1,121 @@
-## Ejercicio 2: Modelado en Clases y Mi primer Perro o Gato en OpenGL :)
+# Practica 2
+<!-- Author: @steve-quezada -->
 
-El alumno deberá **proponer una estructura de clases** que separe responsabilidades, basándose en el [Ejemplo de OpenGL](src/main.cpp). La organización del proyecto debe contemplar que los **archivos de los shaders** se encuentren en un directorio `shader`, desde donde serán leídos por la aplicación.  
+### Integrante
+- Steve Quezada [@steve-quezada]
 
-**Responsabilidades sugeridas para el modelado de las clases:**  
-- Leer código fuente de shader, compilar, enlazar y utilizar shaders.  (*ejem*... tal vez una clase `ShaderProgram` o un `Shader`)
-- Almacenar datos de vértices, configurar VAO y VBO, y dibujar geometría.  
-- Controlar el pipeline de render: limpiar buffers y dibujar.  
-- Inicializar OpenGL y GLFW, crear y mantener la ventana.  
-- Administrar la ejecución completa de la aplicación y el ciclo principal de render.  
+---
 
-Finalmente, la aplicación deberá **mostrar la silueta un perro o gato hecho con distintas figuras geométricas y usando al menos dos colores distintos** en pantalla, aprovechando la estructura de las clases previamentes organizadas y definidas. Toma de inspiración el siguiente dibujo más no lo copies completamente. 
-
-![](media/MyFirstOpenGL_Dog.png).
-
-
-La estructura del proyecto debería verse algo como: 
+## Estructura del proyecto
 
 ```
-MyFirstOpenGL_Dog/
-    ├── CMakeLists.txt             
-    ├── shaders/                   
-    │   ├── basic.vert
-    │   └── basic.frag
-    ├── include/                   
-    │   └── Class_1.h
-    │   └── Class_2.h
-    └── src/                       
-        ├── main.cpp
-        └── Class_1.cpp
-        └── Class_2.cpp
+2. Practica 2/
+├── README.md                     ← Este archivo
+├── CMakeLists.txt                ← Configuración CMake
+│
+├── shaders/
+│   ├── vert/                     ← Vertex shaders (.vert): posición de vértices
+│   │   └── basic.vert            ←     Vertex Generico
+│   └── frag/                     ← Fragment shaders (.frag): color de cada píxel
+│       ├── oreja_izq.frag        ←     Azul oscuro  #1A3A6B
+│       ├── oreja_der.frag        ←     Naranja      #E07820
+│       ├── cabeza.frag           ←     Azul claro   #5BA3C9
+│       ├── pecho.frag            ←     Amarillo     #F4D03F
+│       ├── cuerpo.frag           ←     Rojo         #C0392B
+│       ├── pata.frag             ←     Morado       #7D3C98
+│       └── cola.frag             ←     Verde        #27AE60
+│
+├── include/
+│   ├── Window.h                  ← Encabezado clase Window
+│   ├── ShaderProgram.h           ← Encabezado clase ShaderProgram
+│   └── Polygon.h                 ← Encabezado clase Polygon
+│
+├── src/
+│   ├── main.cpp                  ← Vértices del gato y ciclo de render
+│   ├── Window.cpp                ← Inicialización GLFW/GLEW y ventana
+│   ├── ShaderProgram.cpp         ← Lectura, compilación y enlace de shaders
+│   └── Polygon.cpp               ← VAO + VBO
+│
+├── media/
+│   ├── Set-Of-Tangram.jpg            ← Referencia: opciones de gato tangram
+│   ├── Tangram-Cat.jpg               ← Referencia: tangram elegido
+│   └── Desmos-Tangram-Cat.png        ← Captura del proceso en Desmos
+│
+└── build-wsl/                    ← (Generado) Binarios
+    └── opengl_intro
 ```
-- **Consideraciones importantes sobre la lectura de shaders**
 
-    En un proyecto de OpenGL,  los shaders suelen almacenarse en un directorio llamado `shaders`, cada uno con la terminación `.vert` o `frag`. Algunos ejemplos de nombres pueden ser `shade.vert`, `shader.frag` o usando la terminación `.glsl`.
+---
 
-    Para poder leer los datos de los shaders, considera los tipos `std::ifstream fileStream(filePath, std::ios::in)` y `std::string content((std::istreambuf_iterator<char>(fileStream)),std::istreambuf_iterator<char>())` . Asímismo, la clase `string` tiene el método  `char *source = string.c_str();` bastante útil para convertir de una `string` a un apuntador de caractéres. 
+## Compilacion y Ejecucion
 
-- **Consideraciones sobre el uso de varios fragment shaders**
+```bash
+# Configurar 
+cmake -B build
 
-    Para poder pintar en colores distintos, al menos para esta práctica, basta con definir un segundo shader de fragmentos con otro color. 
+# Compilar
+cmake --build build
 
-- **Consideraciones importantes sobre el [CMakeLists.txt](CMakeLists.txt)**
+# Ejecutar
+./build/opengl_intro
+```
 
-    El archivo [CMakeLists.txt](CMakeLists.txt) está en el supuesto de que la computadora tiene instaladas las bibliotecas de `glfw` y `glew`, de tal manera que en el comando `target_link_libraries` las busca en automático. En caso de error, se recomienda que las bibliotecas se instalen como `shared libraries`.  
+---
 
-    Recordemos que, mientras que en el comando `include_directories(${PROJECT_SOURCE_DIR}/include)` se agregan todos los *headers (.h)*, en el `CmakeLists.txt` se tiene que agregar explícitamente qué `.cpp`s se van a utilizar para generar el ejecutable en la instrucción `add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp)`. 
+## El gato
 
+La silueta del gato está construida con **7 triángulos**:
 
-[*Ejemplo visto en clase extraído de learnOpenGL*](https://learnopengl.com/Getting-started/Hello-Triangle)
+<div align="center">
+
+| Parte | Triángulos | Color |
+|---|---|---|
+| Oreja izquierda | 1 | Azul oscuro |
+| Oreja derecha | 1 | Naranja |
+| Cabeza | 2 | Azul claro |
+| Pecho | 1 | Amarillo |
+| Cuerpo | 1 | Rojo |
+| Pata | 1 | Morado |
+| Cola | 2 | Verde |
+
+</div>
+
+---
+
+## Referencia
+
+<div align="center">
+
+![Set de tangrams](media/Set-Of-Tangram.jpg)
+
+</div>
+
+Se eligió esta figura:
+
+<div align="center">
+
+![Tangram elegido](media/Tangram-Cat.jpg)
+
+</div>
+
+---
+
+## Obtención de coordenadas [Desmos]
+
+Las coordenadas se obtuvieron con [Desmos Graphing Calculator](https://www.desmos.com/calculator/ggumupgo3j?lang=es):
+
+<div align="center">
+
+![Proceso en Desmos](media/Desmos-Tangram-Cat.png)
+
+</div>
+
+---
+
+## Resultado Final
+
+<div align="center">
+
+![Tangram OpenGL](media/OpenGL-Tangram-Cat.png)
+
+</div>
