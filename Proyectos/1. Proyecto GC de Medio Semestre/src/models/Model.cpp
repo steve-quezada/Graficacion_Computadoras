@@ -1,6 +1,11 @@
 // Implementación de la clase base.
 
 #include "models/Model.h"
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 Model::~Model()
 {
@@ -18,4 +23,14 @@ void Model::rotate(float degrees, char axis)
         m_model = m_model * Matrix4D::rotateY(rad);
     else if (axis == 'z' || axis == 'Z')
         m_model = m_model * Matrix4D::rotateZ(rad);
+}
+
+void Model::translate(float dx, float dy, float dz)
+{
+    m_model = Matrix4D::translate({dx, dy, dz}) * m_model;
+}
+
+void Model::resetTransform()
+{
+    m_model = Matrix4D();
 }

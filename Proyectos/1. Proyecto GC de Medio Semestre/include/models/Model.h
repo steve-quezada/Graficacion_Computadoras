@@ -2,14 +2,9 @@
 // Administra VAO, VBO, EBO y mantiene la matriz de modelo.
 
 #pragma once
-#include <cmath>
 #include <GL/glew.h>
 #include "engine/ShaderProgram.h"
 #include "math/Matrix4D.h"
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 class Model
 {
@@ -24,11 +19,17 @@ public:
     // Dibuja el modelo usando las matrices de vista y proyección
     virtual void render(const Matrix4D &view, const Matrix4D &projection) = 0;
 
-    // Actualiza la lógica del modelo con el delta de tiempo
-    virtual void update(float deltaTime) = 0;
-
     // Rota la matriz del modelo en el eje dado (ángulo en grados)
     void rotate(float degrees, char axis);
+
+    // Traslada el modelo en el espacio
+    void translate(float dx, float dy, float dz);
+
+    // Regresa el modelo a su posición original (matriz identidad)
+    void resetTransform();
+
+    // Reemplaza la matriz del modelo
+    void setModelMatrix(const Matrix4D &mat) { m_model = mat; }
 
 protected:
     ShaderProgram *m_shader;
