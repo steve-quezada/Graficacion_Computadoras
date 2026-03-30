@@ -85,3 +85,13 @@ Después entra en un ciclo que se repite mientras la ventana esté abierta. En c
 | `ESC` | Cerrar ventana |
 
 ---
+
+## Resultado Final
+
+<div align="center">
+<img src="media/Cubo-1.png" width="500"/>
+</div>
+
+<div align="center">
+<img src="media/Cubo-2.png" width="500"/>
+</div>
