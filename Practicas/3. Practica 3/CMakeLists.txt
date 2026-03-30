@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(opengl_intro)
+project(practica3)
 
 # Estándar de C++
 set(CMAKE_CXX_STANDARD 20)
@@ -18,13 +18,15 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 
-
 # Ejecutable
 add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCE_DIR}/src/main.cpp
-    ${PROJECT_SOURCE_DIR}/src/ShaderProgram.cpp
-    ${PROJECT_SOURCE_DIR}/src/Polygon.cpp
-    ${PROJECT_SOURCE_DIR}/src/Window.cpp
+    src/main.cpp
+    src/engine/Window.cpp
+    src/engine/ShaderProgram.cpp
+    src/engine/Camera.cpp
+    src/models/Model.cpp
+    src/models/Cube.cpp
+    src/scene/Scene.cpp
 )
 
 # Librerías
