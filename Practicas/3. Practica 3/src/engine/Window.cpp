@@ -1,24 +1,26 @@
-// Inicializa GLFW-GLEW y crea la ventana
+// Implementación de la ventana OpenGL.
 
-#include "Window.h"
+#include "engine/Window.h"
 #include <iostream>
 
-// Ajusta la vista al redimensionar la ventana [main.cpp]
+// Ajusta la vista al redimensionar la ventana
 static void framebufferSizeCallback(GLFWwindow * /*window*/, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
-// Inicializacion y configuracion [main.cpp]
 Window::Window(int width, int height, const char *title)
+    : m_width{width}, m_height{height}
 {
+    // Configura la versión y perfil de OpenGL antes de crear la ventana
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    handle = glfwCreateWindow(width, height, title, NULL, NULL);
-    if (handle == NULL)
+    // Crea la ventana y establece el contexto actual
+    handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (handle == nullptr)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -28,6 +30,7 @@ Window::Window(int width, int height, const char *title)
     glfwMakeContextCurrent(handle);
     glfwSetFramebufferSizeCallback(handle, framebufferSizeCallback);
 
+    // Inicializa GLEW para cargar las funciones de OpenGL
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
     {
@@ -35,25 +38,26 @@ Window::Window(int width, int height, const char *title)
     }
 }
 
-// Pregunta si se cerró la ventana
 bool Window::shouldClose()
 {
     return glfwWindowShouldClose(handle);
 }
 
-// Muestra el frame que se acaba de dibujar
 void Window::swapBuffers()
 {
     glfwSwapBuffers(handle);
 }
 
-// Procesa los eventos del sistema
 void Window::pollEvents()
 {
     glfwPollEvents();
 }
 
-// Libera todos los recursos
+float Window::getAspectRatio() const
+{
+    return static_cast<float>(m_width) / static_cast<float>(m_height);
+}
+
 Window::~Window()
 {
     glfwTerminate();
