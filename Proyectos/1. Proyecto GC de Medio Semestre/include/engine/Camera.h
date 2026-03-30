@@ -2,7 +2,6 @@
 // Encapsula posición, orientación, proyección y la lógica de órbita.
 
 #pragma once
-#include <cmath>
 #include "math/Vector3D.h"
 #include "math/Matrix4D.h"
 
@@ -15,6 +14,12 @@ public:
 
     // Orbitar la cámara
     void orbit(float deltaYaw, float deltaPitch);
+
+    // Acercar o alejar la cámara cambiando el radio
+    void zoom(float amount);
+
+    // Reiniciar la cámara a su posición inicial
+    void resetView(const Vector3D &target, float radius);
 
     // Matrices de vista y proyección
     Matrix4D getViewMatrix() const;

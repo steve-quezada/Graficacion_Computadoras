@@ -2,6 +2,7 @@
 // Coordenadas esféricas → posición 3D → matriz de vista y proyección.
 
 #include "engine/Camera.h"
+#include <cmath>
 
 Camera::Camera(const Vector3D &target, float radius, float pitch, float yaw,
                float fov, float near, float far)
@@ -30,6 +31,22 @@ void Camera::orbit(float deltaYaw, float deltaPitch)
         m_pitch = -m_maxPitch;
 }
 
+void Camera::zoom(float amount)
+{
+    m_radius += amount;
+    if (m_radius < 0.1f)
+        m_radius = 0.1f;
+}
+
+void Camera::resetView(const Vector3D &target, float radius)
+{
+    // Restaurar el target, radio, y ángulos a valores iniciales
+    m_target = target;
+    m_radius = radius;
+    m_pitch = 0.5f;
+    m_yaw = 0.0f;
+}
+
 Matrix4D Camera::getViewMatrix() const
 {
     Vector3D pos = calculatePosition();
@@ -48,10 +65,11 @@ Vector3D Camera::calculatePosition() const
     //   x = r * cos(pitch) * sin(yaw)  — componente horizontal
     //   y = r * sin(pitch)             — componente vertical
     //   z = r * cos(pitch) * cos(yaw)  — componente de profundidad
+    // Se suma m_target para que la cámara orbite alrededor del target, no del origen
     return {
-        m_radius * std::cos(m_pitch) * std::sin(m_yaw),
-        m_radius * std::sin(m_pitch),
-        m_radius * std::cos(m_pitch) * std::cos(m_yaw)};
+        m_target.x + m_radius * std::cos(m_pitch) * std::sin(m_yaw),
+        m_target.y + m_radius * std::sin(m_pitch),
+        m_target.z + m_radius * std::cos(m_pitch) * std::cos(m_yaw)};
 }
 
 Matrix4D Camera::lookAt(const Vector3D &eye, const Vector3D &center, const Vector3D &up)
@@ -86,13 +104,11 @@ Matrix4D Camera::perspective(float fov, float aspect, float near, float far)
     // Tangente del angulo vertical define cuánto se ve arriba/abajo
     float tanHalf = std::tan(fov / 2.0f);
 
+    // Matriz identidad con (3,3) = 0 para la división homogénea
     Matrix4D mat;
-    mat(0, 0) = 0.0f;
-    mat(1, 1) = 0.0f;
-    mat(2, 2) = 0.0f;
     mat(3, 3) = 0.0f;
 
-    // Escala X e Y para mapear
+    // Escala X e Y según el ángulo de visión y aspecto
     mat(0, 0) = 1.0f / (aspect * tanHalf);
     mat(1, 1) = 1.0f / tanHalf;
 
