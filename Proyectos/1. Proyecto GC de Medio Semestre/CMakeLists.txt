@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(practica3)
+project(proyecto_medio)
 
 # Estándar de C++
 set(CMAKE_CXX_STANDARD 20)
@@ -25,7 +25,9 @@ add_executable(${PROJECT_NAME}
     src/engine/ShaderProgram.cpp
     src/engine/Camera.cpp
     src/models/Model.cpp
-    src/models/Cube.cpp
+    src/models/CustomModel.cpp
+    src/models/Axes.cpp
+    src/loaders/ObjLoader.cpp
     src/scene/Scene.cpp
 )
 
@@ -42,4 +44,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${PROJECT_SOURCE_DIR}/shaders
     $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+)
+
+# Copiar carpeta obj al directorio del ejecutable
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/obj
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/obj
 )
