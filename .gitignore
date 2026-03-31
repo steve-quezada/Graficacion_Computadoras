@@ -9,7 +9,7 @@ cmake-build-*/
 
 # Archivos objeto
 *.o
-*.obj
+# *.obj
 *.a
 *.lib
 
@@ -70,10 +70,11 @@ Proyectos/**/build*
 # Latex
 Tareas/**/Latex
 Practicas/**/Latex
+**/**/*.pdf
 
 # Markdown
 Practicas/**/Markdown
 Proyectos/**/Markdown
 
-Practicas/3. Practica 3/Practica_3_Graficacion_20262.pdf
+# Archivos específicos de proyectos
 /Practicas/3. Practica 3/\[base\] OpenGL3D
