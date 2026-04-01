@@ -1,4 +1,4 @@
-// Implementación de la cámara orbital.
+// Implementación de la cámara orbital con modo libre.
 // Coordenadas esféricas → posición 3D → matriz de vista y proyección.
 
 #include "engine/Camera.h"
@@ -14,7 +14,9 @@ Camera::Camera(const Vector3D &target, float radius, float pitch, float yaw,
       m_fov{fov},
       m_near{near},
       m_far{far},
-      m_maxPitch{1.4f} // ~80° (radianes)
+      m_maxPitch{1.4f},
+      m_freeMode{false},
+      m_freePos{0.0f, 0.0f, 0.0f}
 {
 }
 
@@ -40,17 +42,54 @@ void Camera::zoom(float amount)
 
 void Camera::resetView(const Vector3D &target, float radius)
 {
-    // Restaurar el target, radio, y ángulos a valores iniciales
     m_target = target;
     m_radius = radius;
     m_pitch = 0.5f;
     m_yaw = 0.0f;
+    m_freeMode = false;
 }
 
 Matrix4D Camera::getViewMatrix() const
 {
+    if (m_freeMode)
+    {
+        // En modo libre, la cámara está en m_freePos y mira según yaw/pitch
+        Vector3D fwd = {
+            -std::cos(m_pitch) * std::sin(m_yaw),
+            -std::sin(m_pitch),
+            -std::cos(m_pitch) * std::cos(m_yaw)
+        };
+        Vector3D center = m_freePos + fwd;
+        return lookAt(m_freePos, center, m_up);
+    }
     Vector3D pos = calculatePosition();
     return lookAt(pos, m_target, m_up);
+}
+
+void Camera::toggleFreeMode()
+{
+    m_freeMode = !m_freeMode;
+    if (m_freeMode)
+        m_freePos = calculatePosition();
+}
+
+bool Camera::isFreeMode() const
+{
+    return m_freeMode;
+}
+
+void Camera::move(float forward, float right, float up)
+{
+    // Dirección frontal según yaw/pitch
+    Vector3D fwd = {
+        -std::cos(m_pitch) * std::sin(m_yaw),
+        -std::sin(m_pitch),
+        -std::cos(m_pitch) * std::cos(m_yaw)
+    };
+    // Dirección derecha = forward × up del mundo
+    Vector3D r = fwd.cross(m_up).normalized();
+
+    m_freePos += fwd * forward + r * right + m_up * up;
 }
 
 Matrix4D Camera::getProjectionMatrix(float aspect) const

@@ -1,5 +1,6 @@
-// Cámara orbital en coordenadas esféricas.
-// Encapsula posición, orientación, proyección y la lógica de órbita.
+// Cámara orbital con modo libre.
+// Modo orbital: coordenadas esféricas alrededor de un target.
+// Modo libre:   movimiento libre en el espacio 3D.
 
 #pragma once
 #include "math/Vector3D.h"
@@ -25,6 +26,15 @@ public:
     Matrix4D getViewMatrix() const;
     Matrix4D getProjectionMatrix(float aspect) const;
 
+    // Alternar entre modo orbital y modo libre
+    void toggleFreeMode();
+
+    // Consultar si está en modo libre
+    bool isFreeMode() const;
+
+    // Mover la cámara en modo libre
+    void move(float forward, float right, float up);
+
     // LookAt: construye la matriz de vista que orienta la cámara.
     // Calcula tres ejes ortogonales:
     //   f (forward) — dirección hacia donde mira la cámara
@@ -40,15 +50,18 @@ public:
     static Matrix4D perspective(float fov, float aspect, float near, float far);
 
 private:
-    Vector3D m_target; // Punto al centro donde mira la cámara
-    Vector3D m_up;     // Dirección arriba del mundo
-    float m_radius;    // Distancia de la cámara al target (radio de la esfera)
-    float m_pitch;     // Ángulo vertical: Posición arriba/abajo de la cámara (radianes)
-    float m_yaw;       // Ángulo horizontal: Posición izquierda/derecha de la cámara (radianes)
-    float m_fov;       // Campo de visión vertical (radianes)
-    float m_near;      // Plano cercano
-    float m_far;       // Plano lejano
-    float m_maxPitch;  // Límite para evitar que la cámara se voltee en el polo
+    Vector3D m_target;   // Punto al centro donde mira la cámara
+    Vector3D m_up;       // Dirección arriba del mundo
+    float m_radius;      // Distancia de la cámara al target (radio de la esfera)
+    float m_pitch;       // Ángulo vertical: Posición arriba/abajo de la cámara (radianes)
+    float m_yaw;         // Ángulo horizontal: Posición izquierda/derecha de la cámara (radianes)
+    float m_fov;         // Campo de visión vertical (radianes)
+    float m_near;        // Plano cercano
+    float m_far;         // Plano lejano
+    float m_maxPitch;    // Límite para evitar que la cámara se voltee en el polo
+
+    bool m_freeMode;     // true = modo libre, false = modo orbital
+    Vector3D m_freePos;  // posición de la cámara en modo libre
 
     // Calcula la posición de la cámara a partir de coordenadas esféricas
     Vector3D calculatePosition() const;

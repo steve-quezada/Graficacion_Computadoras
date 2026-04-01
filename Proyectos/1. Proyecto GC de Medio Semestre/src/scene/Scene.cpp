@@ -53,6 +53,7 @@ void Scene::init()
     m_renderMode = 0;
     m_tabWasPressed = false;
     m_fWasPressed = false;
+    m_cWasPressed = false;
 
     std::cout << "\n";
     std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
@@ -132,6 +133,28 @@ void Scene::processInput(float deltaTime)
         focusCurrentModel();
     m_fWasPressed = fNow;
 
+    // C: alternar cámara orbital / libre
+    bool cNow = glfwGetKey(m_window->handle, GLFW_KEY_C) == GLFW_PRESS;
+    if (cNow && !m_cWasPressed)
+    {
+        m_camera->toggleFreeMode();
+        if (m_camera->isFreeMode())
+        {
+            std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
+            std::cout << TEAL << "\u2551" << RESET << "         C\u00e1mara: Libre            " << TEAL << "\u2551" << RESET << "\n";
+            std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n";
+            std::cout << "\n";
+        }
+        else
+        {
+            std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
+            std::cout << TEAL << "\u2551" << RESET << "         C\u00e1mara: Orbital          " << TEAL << "\u2551" << RESET << "\n";
+            std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n";
+            std::cout << "\n";
+        }
+    }
+    m_cWasPressed = cNow;
+
     // 1: modo superfice
     if (glfwGetKey(m_window->handle, GLFW_KEY_1) == GLFW_PRESS && m_renderMode != 0)
     {
@@ -174,29 +197,70 @@ void Scene::processInput(float deltaTime)
     // Camara
     if (!shift && !ctrl)
     {
-        // WASD: orbitar
-        float orbitSpeed = 2.0f;
-        float deltaYaw = 0.0f;
-        float deltaPitch = 0.0f;
+        if (m_camera->isFreeMode())
+        {
+            // Modo libre: WASD mover
+            float moveSpeed = baseSpeed * 2.0f;
+            float fwd = 0, rgt = 0, upd = 0;
 
-        if (glfwGetKey(m_window->handle, GLFW_KEY_A) == GLFW_PRESS)
-            deltaYaw -= orbitSpeed * deltaTime;
-        if (glfwGetKey(m_window->handle, GLFW_KEY_D) == GLFW_PRESS)
-            deltaYaw += orbitSpeed * deltaTime;
-        if (glfwGetKey(m_window->handle, GLFW_KEY_W) == GLFW_PRESS)
-            deltaPitch += orbitSpeed * deltaTime;
-        if (glfwGetKey(m_window->handle, GLFW_KEY_S) == GLFW_PRESS)
-            deltaPitch -= orbitSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_W) == GLFW_PRESS)
+                fwd += moveSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_S) == GLFW_PRESS)
+                fwd -= moveSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_A) == GLFW_PRESS)
+                rgt -= moveSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_D) == GLFW_PRESS)
+                rgt += moveSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_Q) == GLFW_PRESS)
+                upd += moveSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_E) == GLFW_PRESS)
+                upd -= moveSpeed * deltaTime;
 
-        if (deltaYaw != 0.0f || deltaPitch != 0.0f)
-            m_camera->orbit(deltaYaw, deltaPitch);
+            if (fwd != 0 || rgt != 0 || upd != 0)
+                m_camera->move(fwd, rgt, upd);
 
-        // Q/E: zoom
-        float zoomSpeed = baseSpeed * 2.0f;
-        if (glfwGetKey(m_window->handle, GLFW_KEY_Q) == GLFW_PRESS)
-            m_camera->zoom(-zoomSpeed * deltaTime);
-        if (glfwGetKey(m_window->handle, GLFW_KEY_E) == GLFW_PRESS)
-            m_camera->zoom(zoomSpeed * deltaTime);
+            // Flechas: cambiar dirección de mirada
+            float lookSpeed = 2.0f;
+            float dYaw = 0, dPitch = 0;
+
+            if (glfwGetKey(m_window->handle, GLFW_KEY_LEFT) == GLFW_PRESS)
+                dYaw -= lookSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_RIGHT) == GLFW_PRESS)
+                dYaw += lookSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_UP) == GLFW_PRESS)
+                dPitch += lookSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_DOWN) == GLFW_PRESS)
+                dPitch -= lookSpeed * deltaTime;
+
+            if (dYaw != 0 || dPitch != 0)
+                m_camera->orbit(dYaw, dPitch);
+        }
+        else
+        {
+            // Modo orbital: WASD orbitar
+            float orbitSpeed = 2.0f;
+            float deltaYaw = 0.0f;
+            float deltaPitch = 0.0f;
+
+            if (glfwGetKey(m_window->handle, GLFW_KEY_A) == GLFW_PRESS)
+                deltaYaw -= orbitSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_D) == GLFW_PRESS)
+                deltaYaw += orbitSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_W) == GLFW_PRESS)
+                deltaPitch += orbitSpeed * deltaTime;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_S) == GLFW_PRESS)
+                deltaPitch -= orbitSpeed * deltaTime;
+
+            if (deltaYaw != 0.0f || deltaPitch != 0.0f)
+                m_camera->orbit(deltaYaw, deltaPitch);
+
+            // Q/E: zoom
+            float zoomSpeed = baseSpeed * 2.0f;
+            if (glfwGetKey(m_window->handle, GLFW_KEY_Q) == GLFW_PRESS)
+                m_camera->zoom(-zoomSpeed * deltaTime);
+            if (glfwGetKey(m_window->handle, GLFW_KEY_E) == GLFW_PRESS)
+                m_camera->zoom(zoomSpeed * deltaTime);
+        }
     }
 
     if (m_models.empty())
@@ -238,6 +302,16 @@ void Scene::processInput(float deltaTime)
             m_models[m_currentModel]->translate(0, 0, -moveSpeed * deltaTime);
         if (glfwGetKey(m_window->handle, GLFW_KEY_E) == GLFW_PRESS)
             m_models[m_currentModel]->translate(0, 0, moveSpeed * deltaTime);
+    }
+
+    // Ctrl + Shift + Q/E: escalar
+    if (ctrl && shift)
+    {
+        float scaleFactor = 1.0f + deltaTime;
+        if (glfwGetKey(m_window->handle, GLFW_KEY_Q) == GLFW_PRESS)
+            m_models[m_currentModel]->scale(scaleFactor);
+        if (glfwGetKey(m_window->handle, GLFW_KEY_E) == GLFW_PRESS)
+            m_models[m_currentModel]->scale(1.0f / scaleFactor);
     }
 
     // R: resetear transformación del modelo

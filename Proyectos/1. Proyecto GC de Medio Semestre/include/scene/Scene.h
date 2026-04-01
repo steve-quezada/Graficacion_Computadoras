@@ -33,6 +33,7 @@ private:
     int m_renderMode;                    // 0 = superfice, 1 = wireframe, 2 = puntos
     bool m_tabWasPressed;                // edge detection para Tab
     bool m_fWasPressed;                  // edge detection para F
+    bool m_cWasPressed;                  // edge detection para C
 
     // Crea ventana, shader, cámara, ejes y carga los modelos obj
     void init();
