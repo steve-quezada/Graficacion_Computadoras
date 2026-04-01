@@ -55,7 +55,10 @@ void Window::pollEvents()
 
 float Window::getAspectRatio() const
 {
-    return static_cast<float>(m_width) / static_cast<float>(m_height);
+    int w, h;
+    glfwGetFramebufferSize(handle, &w, &h);
+    if (h == 0) h = 1;
+    return static_cast<float>(w) / static_cast<float>(h);
 }
 
 Window::~Window()
