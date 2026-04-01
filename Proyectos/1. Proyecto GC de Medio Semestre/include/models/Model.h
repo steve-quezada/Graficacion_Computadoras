@@ -25,6 +25,9 @@ public:
     // Traslada el modelo en el espacio
     void translate(float dx, float dy, float dz);
 
+    // Escala el modelo uniformemente
+    void scale(float factor);
+
     // Regresa el modelo a su posición original (matriz identidad)
     void resetTransform();
 

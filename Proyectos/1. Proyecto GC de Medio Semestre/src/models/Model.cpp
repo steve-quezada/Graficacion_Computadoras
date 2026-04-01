@@ -30,6 +30,11 @@ void Model::translate(float dx, float dy, float dz)
     m_model = Matrix4D::translate({dx, dy, dz}) * m_model;
 }
 
+void Model::scale(float factor)
+{
+    m_model = m_model * Matrix4D::scale({factor, factor, factor});
+}
+
 void Model::resetTransform()
 {
     m_model = Matrix4D();
