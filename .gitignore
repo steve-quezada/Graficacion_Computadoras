@@ -9,7 +9,7 @@ cmake-build-*/
 
 # Archivos objeto
 *.o
-*.obj
+# *.obj
 *.a
 *.lib
 
@@ -61,8 +61,20 @@ Thumbs.db
 
 # Carpetas Internas
 Practicas/0. Pruebas
-Proyectos/
 
-Tareas/Tarea01/JuegoDeLaVida/build-wsl
-Tareas/Tarea01/JuegoDeLaVida/build-linux
-Tareas/Tarea01/JuegoDeLaVida/build-macos
+# Builds
+Tareas/**/build*
+Practicas/**/build*
+Proyectos/**/build*
+
+# Latex
+Tareas/**/Latex
+Practicas/**/Latex
+**/**/*.pdf
+
+# Markdown
+Practicas/**/Markdown
+Proyectos/**/Markdown
+
+# Archivos específicos de proyectos
+/Practicas/3. Practica 3/\[base\] OpenGL3D
