@@ -90,6 +90,7 @@ Al iniciar, `main.cpp` crea un `Scene` en el stack, que en su constructor:
 ---
 
 ## Compilación y Ejecución
+> Nota: la compilación y ejecución fueron realizadas en WSL sobre Debian 13.3.
 
 ### Requisitos
 
