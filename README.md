@@ -36,5 +36,6 @@
 | 01 | Juego de la vida | [Tarea01/](Tareas/Tarea01/JuegoDeLaVida/) |
 | 02 | Primer dibujo en SFML | [Tarea02/](Tareas/Tarea02/DibujoPixeles/) |
 | 03 | Primer Modelo en Blender | [Tarea03/](Tareas/Tarea03/PrimerModeloenBlender/) |
+| 04 | Blender Texturas | [Tarea04/](Tareas/Tarea04/BlenderTexturas/) |
 
 </div>
