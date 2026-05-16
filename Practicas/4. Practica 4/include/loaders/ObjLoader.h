@@ -1,22 +1,34 @@
-// Carga un archivo .obj y almacena los vértices (posición + color por cara).
+// Cargador de archivos .obj optimizado.
 
 #pragma once
-#include <string>
 #include <vector>
-#include "math/Vector3D.h"
-
-struct ObjData
-{
-    std::vector<float> vertices; // posición (3) + color (3) por vértice
-    int vertexCount;             // vértices originales
-    int faceCount;               // caras del archivo
-    Vector3D minBound;           // esquina mínima del bounding box
-    Vector3D maxBound;           // esquina máxima del bounding box
-};
+#include <string>
 
 class ObjLoader
 {
+private:
+    // Valores leidos de un OBJ
+    std::vector<float> vertVals;
+    std::vector<float> stVals;
+    std::vector<float> normVals;
+
+    // Valores almacenados para ser usados como vertex attributes
+    std::vector<float> triangleVerts;
+    std::vector<float> textureCoords;
+    std::vector<float> normals;
+
+    std::vector<unsigned int> indices;
+
 public:
-    // Lee un archivo .obj y devuelve los datos con colores por cara
-    static ObjData load(const std::string &path);
+    ObjLoader();
+
+    // Lee el archivo OBJ y llena los vectores
+    void parseOBJ(const char *filePath);
+
+    // Getters
+    int getNumVertices();
+    std::vector<float> getVertices();
+    std::vector<float> getTextureCoordinates();
+    std::vector<float> getNormals();
+    std::vector<unsigned int> getIndices();
 };
