@@ -11,8 +11,7 @@
 
 class CustomModel : public Model
 {
-refactor(loader) : moderniza ObjLoader con parser indexado y buffers optimizados
-                   private :
+private:
     // Configuración del modelo
     const char *m_filePath;
 

@@ -172,4 +172,3 @@ std::vector<float> ObjLoader::getVertices() { return triangleVerts; }
 std::vector<float> ObjLoader::getTextureCoordinates() { return textureCoords; }
 std::vector<float> ObjLoader::getNormals() { return normals; }
 std::vector<unsigned int> ObjLoader::getIndices() { return indices; }
-std::string ObjLoader::getTexturePath() const { return m_texturePath; }
