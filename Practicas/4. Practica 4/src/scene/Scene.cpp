@@ -224,14 +224,14 @@ void Scene::processInput(float deltaTime)
         {
             glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             std::cout << "\n"
-                      << TEAL << "[CAMARA]" << RESET << " Modo: Clic + Raton Activado\n";
+                      << TEAL << "[CAMARA]" << RESET << " Modo: Clic + Raton\n";
         }
         else
         {
             glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             m_firstMouse = true;
             std::cout << "\n"
-                      << TEAL << "[CAMARA]" << RESET << " Modo: Raton Libre Activado\n";
+                      << TEAL << "[CAMARA]" << RESET << " Modo: Raton Libre\n";
         }
     }
     m_mWasPressed = mPressed;
