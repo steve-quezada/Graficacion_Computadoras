@@ -27,6 +27,9 @@
 | 1 | Fundamentos de POO y Linear Interpolation | [Practica 01/](Practicas/1.%20Practica%201/) |
 | 2 | Modelado en Clases y Mi primer Perro o Gato en OpenGL | [Practica 02/](Practicas/2.%20Practica%202/) |
 | 3 | Cubo 3D | [Practica 03/](Practicas/3.%20Practica%203/) |
+| 4 | Modelo de Phong y Texturas | [Practica 04/](Practicas/4.%20Practica%204/) |
+
+# Práctica 4 – 
 
 ## Tareas
 
