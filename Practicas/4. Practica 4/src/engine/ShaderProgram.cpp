@@ -81,6 +81,38 @@ void ShaderProgram::setMat4(const std::string &name, const Matrix4D &mat) const
         1, GL_FALSE, mat.value_ptr());
 }
 
+void ShaderProgram::setMat3(const std::string &name, const Matrix3D &mat) const
+{
+    glUniformMatrix3fv(
+        glGetUniformLocation(shaderProgram, name.c_str()),
+        1, GL_FALSE, &mat.m[0][0]);
+}
+
+void ShaderProgram::setVec3(const std::string &name, float x, float y, float z) const
+{
+    glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), x, y, z);
+}
+
+void ShaderProgram::setVec3(const std::string &name, const Vector3D &v) const
+{
+    glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), v.x, v.y, v.z);
+}
+
+void ShaderProgram::setFloat(const std::string &name, float value) const
+{
+    glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
+void ShaderProgram::setInt(const std::string &name, int value) const
+{
+    glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
+void ShaderProgram::setTextureUnit(const std::string &name, int unit) const
+{
+    glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), unit);
+}
+
 ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(shaderProgram);
