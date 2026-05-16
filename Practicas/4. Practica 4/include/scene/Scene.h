@@ -7,6 +7,8 @@
 #include "engine/Camera.h"
 #include "models/CustomModel.h"
 #include "models/Axes.h"
+#include "models/Room.h"
+#include "math/Vector3D.h"
 #include <vector>
 #include <string>
 
@@ -23,27 +25,51 @@ public:
     void render();
 
 private:
-    Window *m_window;
-    ShaderProgram *m_shader;
-    Camera *m_camera;
-    Axes *m_axes;
+    // Recursos
+    Window *m_window;             // Ventana y contexto OpenGL
+    ShaderProgram *m_shader;      // Shader Modelo de Phong y Texturas
+    ShaderProgram *m_axesShader;  // Shader ejes XYZ
+    Camera *m_camera;             // Cámara FPS
+    Axes *m_axes;                 // Ejes XYZ
+    Room *m_room;                 // Habitación explorable
 
-    std::vector<CustomModel *> m_models; // modelos obj cargados
-    int m_currentModel;                  // índice del modelo activo
-    int m_renderMode;                    // 0 = superfice, 1 = wireframe, 2 = puntos
-    bool m_tabWasPressed;                // edge detection para Tab
-    bool m_fWasPressed;                  // edge detection para F
-    bool m_cWasPressed;                  // edge detection para C
+    std::vector<CustomModel *> m_models; // Modelos cargados desde OBJ
 
-    // Crea ventana, shader, cámara, ejes y carga los modelos obj
+    int m_renderMode;                    // 0 = fill 
+                                         // 1 = wire 
+                                         // 2 = puntos
+
+    // Iluminación
+    Vector3D m_lightPos;
+    Vector3D m_lightColor;
+
+    // Mouse FPS
+    double m_lastMouseX{0}, m_lastMouseY{0};
+    bool m_firstMouse{true};
+
+    float m_birdAngle{0.0f}; // Ángulo de rotación del modelo animado
+
+    // Teclas para cambiar modos
+    bool m_tabWasPressed{false};
+    bool m_fWasPressed{false};
+    bool m_cWasPressed{false};
+    bool m_rWasPressed{false};
+
+    bool m_requireClick{true};
+    bool m_mWasPressed{false};
+
+    // Inicialización
     void init();
-
-    // Carga todos los archivos .obj disponibles
     void loadModels();
+    void positionModels(); // normaliza y ubica los modelos en la escena
 
-    // Centra la cámara en el modelo actual usando su bounding box
-    void focusCurrentModel();
-
-    // Lee el teclado: orbitar cámara, cambiar modelo, cambiar modo de render
+    // Bucle
     void processInput(float deltaTime);
+
+    // Uniforms de luz/cámara
+    void setLightUniforms();
+
+    // Callback del ratón
+    static void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
+    void onMouseMove(double xpos, double ypos);
 };
