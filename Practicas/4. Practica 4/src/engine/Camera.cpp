@@ -1,5 +1,4 @@
-// Implementación de la cámara orbital con modo libre.
-// Coordenadas esféricas → posición 3D → matriz de vista y proyección.
+// Implementación de la Cámara FPS (primera persona)
 
 #include "engine/Camera.h"
 #include <cmath>
@@ -14,7 +13,7 @@ Camera::Camera(const Vector3D &target, float radius, float pitch, float yaw,
       m_fov{fov},
       m_near{near},
       m_far{far},
-      m_maxPitch{1.4f},
+      m_maxPitch{1.55f},
       m_freeMode{false},
       m_freePos{0.0f, 0.0f, 0.0f}
 {
@@ -53,17 +52,31 @@ Matrix4D Camera::getViewMatrix() const
 {
     if (m_freeMode)
     {
-        // En modo libre, la cámara está en m_freePos y mira según yaw/pitch
-        Vector3D fwd = {
-            -std::cos(m_pitch) * std::sin(m_yaw),
-            -std::sin(m_pitch),
-            -std::cos(m_pitch) * std::cos(m_yaw)
-        };
-        Vector3D center = m_freePos + fwd;
+        Vector3D center = m_freePos + getFront();
         return lookAt(m_freePos, center, m_up);
     }
     Vector3D pos = calculatePosition();
     return lookAt(pos, m_target, m_up);
+}
+
+Vector3D Camera::getPosition() const
+{
+    if (m_freeMode)
+        return m_freePos;
+    return calculatePosition();
+}
+
+Vector3D Camera::getFront() const
+{
+    return Vector3D{
+        -std::cos(m_pitch) * std::sin(m_yaw),
+        -std::sin(m_pitch),
+        -std::cos(m_pitch) * std::cos(m_yaw)};
+}
+
+Vector3D Camera::getRight() const
+{
+    return getFront().cross(m_up).normalized();
 }
 
 void Camera::toggleFreeMode()
@@ -80,16 +93,29 @@ bool Camera::isFreeMode() const
 
 void Camera::move(float forward, float right, float up)
 {
-    // Dirección frontal según yaw/pitch
-    Vector3D fwd = {
-        -std::cos(m_pitch) * std::sin(m_yaw),
-        -std::sin(m_pitch),
-        -std::cos(m_pitch) * std::cos(m_yaw)
-    };
-    // Dirección derecha = forward × up del mundo
-    Vector3D r = fwd.cross(m_up).normalized();
+    Vector3D fwd = getFront();
+    // Movimiento horizontal plano
+    Vector3D fwdFlat = Vector3D{fwd.x, 0.0f, fwd.z}.normalized();
 
-    m_freePos += fwd * forward + r * right + m_up * up;
+    Vector3D r = getRight();
+
+    m_freePos += fwdFlat * forward + r * right + m_up * up;
+}
+
+void Camera::setPosition(const Vector3D &pos)
+{
+    m_freePos = pos;
+    m_freeMode = true;
+}
+
+void Camera::processMouse(float xoffset, float yoffset, float sensitivity)
+{
+    m_yaw += xoffset * sensitivity * (3.14159265f / 180.0f);
+    m_pitch -= yoffset * sensitivity * (3.14159265f / 180.0f);
+    if (m_pitch > m_maxPitch)
+        m_pitch = m_maxPitch;
+    if (m_pitch < -m_maxPitch)
+        m_pitch = -m_maxPitch;
 }
 
 Matrix4D Camera::getProjectionMatrix(float aspect) const

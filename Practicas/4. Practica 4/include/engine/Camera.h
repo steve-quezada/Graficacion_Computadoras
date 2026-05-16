@@ -1,6 +1,4 @@
-// Cámara orbital con modo libre.
-// Modo orbital: coordenadas esféricas alrededor de un target.
-// Modo libre:   movimiento libre en el espacio 3D.
+// Cámara FPS (primera persona).
 
 #pragma once
 #include "math/Vector3D.h"
@@ -26,7 +24,16 @@ public:
     Matrix4D getViewMatrix() const;
     Matrix4D getProjectionMatrix(float aspect) const;
 
-    // Alternar entre modo orbital y modo libre
+    // Posición actual de la cámara en world space
+    Vector3D getPosition() const;
+
+    // Dirección frontal de la cámara
+    Vector3D getFront() const;
+
+    // Dirección derecha de la cámara
+    Vector3D getRight() const;
+
+    // Alternar entre modos
     void toggleFreeMode();
 
     // Consultar si está en modo libre
@@ -35,8 +42,13 @@ public:
     // Mover la cámara en modo libre
     void move(float forward, float right, float up);
 
-    // LookAt: construye la matriz de vista que orienta la cámara.
-    // Calcula tres ejes ortogonales:
+    // Fijar la posición directamente
+    void setPosition(const Vector3D &pos);
+
+    // Procesar movimiento del ratón
+    void processMouse(float xoffset, float yoffset, float sensitivity = 0.1f);
+
+    // LookAt: construye la matriz de vista desde la posición del observador (eye), punto focal (center) y dirección "arriba" (up).
     //   f (forward) — dirección hacia donde mira la cámara
     //   r (right)   — dirección a la derecha de la cámara
     //   u (up)      — dirección arriba de la cámara
@@ -63,6 +75,5 @@ private:
     bool m_freeMode;     // true = modo libre, false = modo orbital
     Vector3D m_freePos;  // posición de la cámara en modo libre
 
-    // Calcula la posición de la cámara a partir de coordenadas esféricas
     Vector3D calculatePosition() const;
 };
