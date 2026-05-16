@@ -1,4 +1,4 @@
-// Modelo cargado desde un archivo .obj.
+// Modelo cargado desde un archivo .obj. con textura y Phong.
 
 #pragma once
 #include "models/Model.h"
@@ -6,30 +6,75 @@
 #include <vector>
 #include <string>
 
+// Definimos el número de Vertex Buffer Objects: Posición, Textura, Normales
+#define NUM_VBOS 3
+
 class CustomModel : public Model
 {
-public:
-    // Carga el obj, sube los datos a la GPU y calcula el bounding box
-    CustomModel(ShaderProgram *program, const std::string &path);
+refactor(loader) : moderniza ObjLoader con parser indexado y buffers optimizados
+                   private :
+    // Configuración del modelo
+    const char *m_filePath;
 
-    // Dibuja el modelo con glDrawArrays
+    // IDs de OpenGL
+    GLuint m_VBO[NUM_VBOS]; // VBO[0] = posiciones
+                            // VBO[1] = coordenadas
+                            // VBO[2] = normales
+
+    GLuint m_EBO; // Element Buffer Object para indexación
+
+    // Datos de la malla en CPU
+    std::vector<float> m_vertices;
+    std::vector<float> m_textCoords;
+    std::vector<float> m_normalVecs;
+    std::vector<unsigned int> m_indices; // índices para glDrawElements
+
+    // Contadores para el renderizado
+    int m_numIndices;
+
+    // Texture
+    GLuint m_textureID; // NUEVO IDENTIFICADOR PARA TEXTURA
+    
+    // Bounding box para normalizar la escala
+    Vector3D m_minBound;
+    Vector3D m_maxBound;
+
+    // Nombre del archivo
+    std::string m_name;
+
+    // Extrae los datos del OBJ a los vectores locales
+    void initGeometry();
+
+    // Sube los datos a la GPU
+    void init();
+
+    // Activa y asigna la textura al shader
+    void renderTexture();
+
+    // Carga textura con SOIL2
+    static GLuint loadTexture(const char *texPath);
+
+    // Textura blanca como fallback
+    static GLuint createWhiteTexture();
+
+public:
+    // Constructor
+    CustomModel(ShaderProgram *program, const char *filePath, const char *texturePath = "");
+
+    ~CustomModel() override;
+
+    // Dibuja el modelo con iluminación Phong y textura
     void render(const Matrix4D &view, const Matrix4D &projection) override;
 
-    // Centro del bounding box
+    // Centro del bounding box en espacio local
     Vector3D getCenter() const;
 
     // Radio del bounding box
     float getBoundingRadius() const;
 
-    // Nombre del archivo cargado
+    // Nombre del archivo
     std::string getName() const;
 
-private:
-    int m_drawCount;     // número de vértices a dibujar
-    Vector3D m_minBound; // esquina mínima del bounding box
-    Vector3D m_maxBound; // esquina máxima del bounding box
-    std::string m_name;  // nombre del archivo
-
-    // Sube los vértices a la GPU
-    void initBuffers(const std::vector<float> &vertices);
+    // Escala a radio 1 y centra en el origen
+    void normalize();
 };
