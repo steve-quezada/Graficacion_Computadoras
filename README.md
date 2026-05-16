@@ -29,8 +29,6 @@
 | 3 | Cubo 3D | [Practica 03/](Practicas/3.%20Practica%203/) |
 | 4 | Modelo de Phong y Texturas | [Practica 04/](Practicas/4.%20Practica%204/) |
 
-# Práctica 4 – 
-
 ## Tareas
 
 | # | Título | Carpeta |
