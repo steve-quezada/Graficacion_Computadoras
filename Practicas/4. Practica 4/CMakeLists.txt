@@ -1,24 +1,17 @@
 cmake_minimum_required(VERSION 3.24)
-project(proyecto_medio)
+project(practica4)
 
-# Estándar de C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Flags del compilador (equivalente a -Wall -Wextra)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall -Wextra)
-endif()
+add_compile_options(-Wall -Wextra)
 
-# Include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# Encontrar bibliotecas
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(glfw3 REQUIRED)
+find_package(GLEW   REQUIRED)
+find_package(glfw3  REQUIRED)
 
-# Ejecutable
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/engine/Window.cpp
@@ -27,28 +20,28 @@ add_executable(${PROJECT_NAME}
     src/models/Model.cpp
     src/models/CustomModel.cpp
     src/models/Axes.cpp
+    src/models/Room.cpp
     src/loaders/ObjLoader.cpp
     src/scene/Scene.cpp
 )
 
-# Librerías
-# Linkear las bibliotecas encontradas
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
     OpenGL::GL
     GLEW::GLEW
     glfw
+    soil2
 )
 
-# Copiar carpeta shaders al directorio del ejecutable
+target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_SOIL2)
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${PROJECT_SOURCE_DIR}/shaders
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+        ${PROJECT_SOURCE_DIR}/shaders
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
 )
 
-# Copiar carpeta obj al directorio del ejecutable
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${PROJECT_SOURCE_DIR}/obj
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/obj
+        ${PROJECT_SOURCE_DIR}/assets
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
 )
