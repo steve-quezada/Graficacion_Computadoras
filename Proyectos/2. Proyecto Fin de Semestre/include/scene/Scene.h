@@ -43,20 +43,9 @@ private:
     Vector3D m_lightPos;
     Vector3D m_lightColor;
 
-    // Mouse FPS
-    double m_lastMouseX{0}, m_lastMouseY{0};
-    bool m_firstMouse{true};
+    float m_birdAngle{0.0f};
 
-    float m_birdAngle{0.0f}; // Ángulo de rotación del modelo animado
-
-    // Teclas para cambiar modos
-    bool m_tabWasPressed{false};
-    bool m_fWasPressed{false};
     bool m_cWasPressed{false};
-    bool m_rWasPressed{false};
-
-    bool m_requireClick{true};
-    bool m_mWasPressed{false};
 
     // Inicialización
     void init();
@@ -68,8 +57,4 @@ private:
 
     // Uniforms de luz/cámara
     void setLightUniforms();
-
-    // Callback del ratón
-    static void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
-    void onMouseMove(double xpos, double ypos);
 };

@@ -45,9 +45,6 @@ public:
     // Fijar la posición directamente
     void setPosition(const Vector3D &pos);
 
-    // Procesar movimiento del ratón
-    void processMouse(float xoffset, float yoffset, float sensitivity = 0.1f);
-
     // LookAt: construye la matriz de vista desde la posición del observador (eye), punto focal (center) y dirección "arriba" (up).
     //   f (forward) — dirección hacia donde mira la cámara
     //   r (right)   — dirección a la derecha de la cámara

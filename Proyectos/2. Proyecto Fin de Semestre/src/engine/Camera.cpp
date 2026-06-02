@@ -94,28 +94,14 @@ bool Camera::isFreeMode() const
 void Camera::move(float forward, float right, float up)
 {
     Vector3D fwd = getFront();
-    // Movimiento horizontal plano
-    Vector3D fwdFlat = Vector3D{fwd.x, 0.0f, fwd.z}.normalized();
-
-    Vector3D r = getRight();
-
-    m_freePos += fwdFlat * forward + r * right + m_up * up;
+    Vector3D r = fwd.cross(m_up).normalized();
+    m_freePos += fwd * forward + r * right + m_up * up;
 }
 
 void Camera::setPosition(const Vector3D &pos)
 {
     m_freePos = pos;
     m_freeMode = true;
-}
-
-void Camera::processMouse(float xoffset, float yoffset, float sensitivity)
-{
-    m_yaw += xoffset * sensitivity * (3.14159265f / 180.0f);
-    m_pitch -= yoffset * sensitivity * (3.14159265f / 180.0f);
-    if (m_pitch > m_maxPitch)
-        m_pitch = m_maxPitch;
-    if (m_pitch < -m_maxPitch)
-        m_pitch = -m_maxPitch;
 }
 
 Matrix4D Camera::getProjectionMatrix(float aspect) const

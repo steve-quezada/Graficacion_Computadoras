@@ -13,40 +13,6 @@ static const float PI = 3.14159265f;
 static const char *TEAL = "\033[38;2;0;128;128m";
 static const char *RESET = "\033[0m";
 
-// Callback estático del ratón
-void Scene::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos)
-{
-    Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
-    if (scene)
-        scene->onMouseMove(xpos, ypos);
-}
-
-void Scene::onMouseMove(double xpos, double ypos)
-{
-    // Rotar la cámara si se mantiene presionado el clic ó modo sin clic
-    if (m_requireClick && glfwGetMouseButton(m_window->handle, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
-    {
-        m_firstMouse = true;
-        return;
-    }
-
-    if (m_firstMouse)
-    {
-        m_lastMouseX = xpos;
-        m_lastMouseY = ypos;
-        m_firstMouse = false;
-        return;
-    }
-
-    float xoffset = static_cast<float>(xpos - m_lastMouseX);
-    float yoffset = static_cast<float>(ypos - m_lastMouseY);
-    m_lastMouseX = xpos;
-    m_lastMouseY = ypos;
-
-    // Sensibilidad normal
-    m_camera->processMouse(xoffset, yoffset, 0.1f);
-}
-
 Scene::Scene()
 {
     init();
@@ -85,11 +51,6 @@ void Scene::init()
     m_camera->toggleFreeMode();
     m_camera->move(0, 0, 0);
 
-    // Ratón visible
-    glfwSetWindowUserPointer(m_window->handle, this);
-    glfwSetCursorPosCallback(m_window->handle, mouseMoveCallback);
-    glfwSetInputMode(m_window->handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
     // Ejes escalados para referencia
     m_axes = new Axes(m_axesShader);
     m_axes->scale(8.0f);
@@ -99,9 +60,6 @@ void Scene::init()
     m_lightColor = Vector3D{1.0f, 1.0f, 1.0f};
 
     m_renderMode = 0;
-    m_firstMouse = true;
-    m_lastMouseX = 0.0;
-    m_lastMouseY = 0.0;
 
     std::cout << "\n";
     std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
@@ -115,13 +73,13 @@ void Scene::init()
 
     std::cout << TEAL << "[FASE 2]" << RESET << " Iniciando ciclo de render\n\n";
     std::cout << "  Controles:\n";
-    std::cout << "    W / S       Avanzar / Retroceder\n";
-    std::cout << "    A / D       Mover Izquierda / Derecha\n";
-    std::cout << "    Q / E       Subir / Bajar\n";
-    std::cout << "    M           Alternar Modo (Clic + Raton / Raton Libre)\n";
-    std::cout << "    Raton       Rotar Vista\n";
-    std::cout << "    1 / 2 / 3   Modo Render (fill / wireframe / puntos)\n";
-    std::cout << "    ESC         Salir\n\n";
+    std::cout << "    W / S         Avanzar / Retroceder\n";
+    std::cout << "    A / D         Mover Izquierda / Derecha\n";
+    std::cout << "    Q / E         Subir / Bajar (libre) | Zoom (orbital)\n";
+    std::cout << "    Flechas       Rotar Vista\n";
+    std::cout << "    C             Alternar Camara (Libre / Orbital)\n";
+    std::cout << "    1 / 2 / 3     Modo Render (fill / wireframe / puntos)\n";
+    std::cout << "    ESC           Salir\n\n";
 }
 
 void Scene::loadModels()
@@ -211,30 +169,28 @@ void Scene::processInput(float deltaTime)
 {
     GLFWwindow *win = m_window->handle;
 
-    // ESC: cerrar
     if (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(win, true);
 
-    // M: alternar modo de cámara
-    bool mPressed = glfwGetKey(win, GLFW_KEY_M) == GLFW_PRESS;
-    if (mPressed && !m_mWasPressed)
+    // C: alternar cámara orbital / libre
+    bool cNow = glfwGetKey(win, GLFW_KEY_C) == GLFW_PRESS;
+    if (cNow && !m_cWasPressed)
     {
-        m_requireClick = !m_requireClick;
-        if (m_requireClick)
+        m_camera->toggleFreeMode();
+        if (m_camera->isFreeMode())
         {
-            glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            std::cout << "\n"
-                      << TEAL << "[CAMARA]" << RESET << " Modo: Clic + Raton\n";
+            std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
+            std::cout << TEAL << "\u2551" << RESET << "         Camara: Libre            " << TEAL << "\u2551" << RESET << "\n";
+            std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n\n";
         }
         else
         {
-            glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            m_firstMouse = true;
-            std::cout << "\n"
-                      << TEAL << "[CAMARA]" << RESET << " Modo: Raton Libre\n";
+            std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
+            std::cout << TEAL << "\u2551" << RESET << "         Camara: Orbital          " << TEAL << "\u2551" << RESET << "\n";
+            std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n\n";
         }
     }
-    m_mWasPressed = mPressed;
+    m_cWasPressed = cNow;
 
     // 1/2/3: modo de render
     if (glfwGetKey(win, GLFW_KEY_1) == GLFW_PRESS && m_renderMode != 0)
@@ -242,63 +198,74 @@ void Scene::processInput(float deltaTime)
         m_renderMode = 0;
         std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
         std::cout << TEAL << "\u2551" << RESET << "         Modo: Superficie         " << TEAL << "\u2551" << RESET << "\n";
-        std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n";
-        std::cout << "\n";
+        std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n\n";
     }
     if (glfwGetKey(win, GLFW_KEY_2) == GLFW_PRESS && m_renderMode != 1)
     {
         m_renderMode = 1;
         std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
         std::cout << TEAL << "\u2551" << RESET << "         Modo: Wireframe          " << TEAL << "\u2551" << RESET << "\n";
-        std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n";
-        std::cout << "\n";
+        std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n\n";
     }
     if (glfwGetKey(win, GLFW_KEY_3) == GLFW_PRESS && m_renderMode != 2)
     {
         m_renderMode = 2;
         std::cout << TEAL << "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557" << RESET << "\n";
         std::cout << TEAL << "\u2551" << RESET << "       Modo: Nube de Puntos       " << TEAL << "\u2551" << RESET << "\n";
-        std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n";
-        std::cout << "\n";
+        std::cout << TEAL << "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d" << RESET << "\n\n";
     }
 
-    // Movimiento de cámara
-    float speed = 6.0f * deltaTime;
-
-    float fwd = 0, rgt = 0, upd = 0;
-    if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
-        fwd += speed;
-    if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
-        fwd -= speed;
-    if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
-        rgt += speed;
-    if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
-        rgt -= speed;
-    if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS)
-        upd += speed;
-    if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS)
-        upd -= speed;
-
-    if (fwd != 0 || rgt != 0 || upd != 0)
+    if (m_camera->isFreeMode())
     {
-        m_camera->move(fwd, rgt, upd);
+        float moveSpeed = 12.0f * deltaTime;
+        float fwd = 0, rgt = 0, upd = 0;
 
-        // Limitar la cámara dentro de la habitación
-        float h = m_room->getHalfSize() - 0.5f;
-        Vector3D pos = m_camera->getPosition();
-        if (pos.x > h)
-            pos.x = h;
-        if (pos.x < -h)
-            pos.x = -h;
-        if (pos.y > h)
-            pos.y = h;
-        if (pos.y < -h + 1.0f)
-            pos.y = -h + 1.0f;
-        if (pos.z > h)
-            pos.z = h;
-        if (pos.z < -h)
-            pos.z = -h;
-        m_camera->setPosition(pos);
+        if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS) fwd += moveSpeed;
+        if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS) fwd -= moveSpeed;
+        if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS) rgt -= moveSpeed;
+        if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS) rgt += moveSpeed;
+        if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS) upd += moveSpeed;
+        if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS) upd -= moveSpeed;
+
+        if (fwd != 0 || rgt != 0 || upd != 0)
+        {
+            m_camera->move(fwd, rgt, upd);
+            float h = m_room->getHalfSize() - 0.5f;
+            Vector3D pos = m_camera->getPosition();
+            if (pos.x >  h) pos.x =  h;
+            if (pos.x < -h) pos.x = -h;
+            if (pos.y >  h) pos.y =  h;
+            if (pos.y < -h + 1.0f) pos.y = -h + 1.0f;
+            if (pos.z >  h) pos.z =  h;
+            if (pos.z < -h) pos.z = -h;
+            m_camera->setPosition(pos);
+        }
+
+        // Flechas: rotar vista
+        float lookSpeed = 2.0f * deltaTime;
+        float dYaw = 0, dPitch = 0;
+        if (glfwGetKey(win, GLFW_KEY_LEFT)  == GLFW_PRESS) dYaw   -= lookSpeed;
+        if (glfwGetKey(win, GLFW_KEY_RIGHT) == GLFW_PRESS) dYaw   += lookSpeed;
+        if (glfwGetKey(win, GLFW_KEY_UP)    == GLFW_PRESS) dPitch += lookSpeed;
+        if (glfwGetKey(win, GLFW_KEY_DOWN)  == GLFW_PRESS) dPitch -= lookSpeed;
+        if (dYaw != 0 || dPitch != 0)
+            m_camera->orbit(dYaw, dPitch);
+    }
+    else
+    {
+        // Orbital: WASD orbita alrededor del centro
+        float orbitSpeed = 2.0f * deltaTime;
+        float dYaw = 0, dPitch = 0;
+        if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS) dYaw   -= orbitSpeed;
+        if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS) dYaw   += orbitSpeed;
+        if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS) dPitch += orbitSpeed;
+        if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS) dPitch -= orbitSpeed;
+        if (dYaw != 0 || dPitch != 0)
+            m_camera->orbit(dYaw, dPitch);
+
+        float zoomSpeed = 12.0f * deltaTime;
+        if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS) m_camera->zoom(-zoomSpeed);
+        if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS) m_camera->zoom( zoomSpeed);
     }
 }
 
