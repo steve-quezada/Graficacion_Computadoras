@@ -1,3 +1,4 @@
+@ -1,41 +0,0 @@
 <div align="center">
   <img width="200" src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png" alt="Logo FC">
   <h1>Graficación por Computadoras 2026-2</h1>
@@ -19,6 +20,7 @@
 | # | Título | Carpeta |
 |:-:|--------|:-------:|
 | 1 | Proyecto de Medio Semestre | [Proyecto 01/](Proyectos/1.%20Proyecto%20GC%20de%20Medio%20Semestre/) |
+| 2 | Proyecto Fin de Semestre | [Proyecto 02/](Proyectos/2.%20Proyecto%20Fin%20de%20Semestre/) |
 
 ## Prácticas
 
