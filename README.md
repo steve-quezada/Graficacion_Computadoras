@@ -1,4 +1,3 @@
-@ -1,41 +0,0 @@
 <div align="center">
   <img width="200" src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png" alt="Logo FC">
   <h1>Graficación por Computadoras 2026-2</h1>
