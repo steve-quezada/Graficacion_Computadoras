@@ -39,6 +39,26 @@ void Camera::zoom(float amount)
         m_radius = 0.1f;
 }
 
+void Camera::clampOrbitalMinY(float minY)
+{
+    if (m_freeMode || m_radius <= 0.0f)
+        return;
+
+    float ratio = (minY - m_target.y) / m_radius;
+    if (ratio <= -1.0f)
+        return;
+
+    if (ratio >= 1.0f)
+    {
+        m_pitch = m_maxPitch;
+        return;
+    }
+
+    float minPitch = std::asin(ratio);
+    if (m_pitch < minPitch)
+        m_pitch = minPitch;
+}
+
 void Camera::resetView(const Vector3D &target, float radius)
 {
     m_target = target;

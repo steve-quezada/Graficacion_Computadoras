@@ -17,6 +17,9 @@ public:
     // Acercar o alejar la cámara cambiando el radio
     void zoom(float amount);
 
+    // En modo orbital, evita que la posición calculada baje de cierta Y
+    void clampOrbitalMinY(float minY);
+
     // Reiniciar la cámara a su posición inicial
     void resetView(const Vector3D &target, float radius);
 
