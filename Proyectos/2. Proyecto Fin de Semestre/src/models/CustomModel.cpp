@@ -3,8 +3,9 @@
 #include "models/CustomModel.h"
 #include "loaders/ObjLoader.h"
 #ifdef HAVE_SOIL2
-#include <SOIL2/SOIL2.h>
+#include <soil2/SOIL2.h>
 #endif
+#include <cmath>
 #include <iostream>
 
 CustomModel::CustomModel(ShaderProgram *program, const char *filePath, const char *texturePath)
@@ -28,8 +29,11 @@ CustomModel::CustomModel(ShaderProgram *program, const char *filePath, const cha
 
 CustomModel::~CustomModel()
 {
-    if (m_textureID)
-        glDeleteTextures(1, &m_textureID);
+    if (m_textureID)    glDeleteTextures(1, &m_textureID);
+    if (m_normalMapID)  glDeleteTextures(1, &m_normalMapID);
+    if (m_normalVAO)    glDeleteVertexArrays(1, &m_normalVAO);
+    if (m_tangentVBO)   glDeleteBuffers(1, &m_tangentVBO);
+    if (m_bitangentVBO) glDeleteBuffers(1, &m_bitangentVBO);
     glDeleteBuffers(NUM_VBOS, m_VBO);
     glDeleteBuffers(1, &m_EBO);
 }
@@ -227,4 +231,171 @@ GLuint CustomModel::createWhiteTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     return id;
+}
+
+// Normal Mapping
+
+// Calcula tangentes y bitangentes por triángulo y las promedia por vértice.
+void CustomModel::computeTangents()
+{
+    int numVerts = static_cast<int>(m_vertices.size()) / 3;
+    m_tangents.assign(numVerts * 3, 0.0f);
+    m_bitangents.assign(numVerts * 3, 0.0f);
+
+    for (int i = 0; i + 2 < static_cast<int>(m_indices.size()); i += 3)
+    {
+        unsigned int i0 = m_indices[i], i1 = m_indices[i + 1], i2 = m_indices[i + 2];
+
+        // Posiciones
+        float p0[3] = {m_vertices[i0*3], m_vertices[i0*3+1], m_vertices[i0*3+2]};
+        float p1[3] = {m_vertices[i1*3], m_vertices[i1*3+1], m_vertices[i1*3+2]};
+        float p2[3] = {m_vertices[i2*3], m_vertices[i2*3+1], m_vertices[i2*3+2]};
+
+        // UVs
+        float u0[2] = {m_textCoords[i0*2], m_textCoords[i0*2+1]};
+        float u1[2] = {m_textCoords[i1*2], m_textCoords[i1*2+1]};
+        float u2[2] = {m_textCoords[i2*2], m_textCoords[i2*2+1]};
+
+        float e1[3] = {p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]};
+        float e2[3] = {p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]};
+
+        float d1[2] = {u1[0]-u0[0], u1[1]-u0[1]};
+        float d2[2] = {u2[0]-u0[0], u2[1]-u0[1]};
+
+        float det = d1[0]*d2[1] - d2[0]*d1[1];
+        float f   = (std::fabs(det) > 1e-8f) ? 1.0f / det : 1.0f;
+
+        float T[3] = {
+            f * (d2[1]*e1[0] - d1[1]*e2[0]),
+            f * (d2[1]*e1[1] - d1[1]*e2[1]),
+            f * (d2[1]*e1[2] - d1[1]*e2[2])
+        };
+        float B[3] = {
+            f * (-d2[0]*e1[0] + d1[0]*e2[0]),
+            f * (-d2[0]*e1[1] + d1[0]*e2[1]),
+            f * (-d2[0]*e1[2] + d1[0]*e2[2])
+        };
+
+        for (int j = 0; j < 3; ++j)
+        {
+            unsigned int idx = m_indices[i + j];
+            m_tangents[idx*3]     += T[0];
+            m_tangents[idx*3 + 1] += T[1];
+            m_tangents[idx*3 + 2] += T[2];
+            m_bitangents[idx*3]     += B[0];
+            m_bitangents[idx*3 + 1] += B[1];
+            m_bitangents[idx*3 + 2] += B[2];
+        }
+    }
+
+    // Normalizar
+    for (int i = 0; i < numVerts; ++i)
+    {
+        auto norm3 = [](float *v){
+            float len = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+            if (len > 1e-8f) { v[0]/=len; v[1]/=len; v[2]/=len; }
+        };
+        norm3(&m_tangents[i*3]);
+        norm3(&m_bitangents[i*3]);
+    }
+}
+
+// Crea un segundo VAO con: location 0 = pos, 1 = normal, 2 = texcoord, 3 = tangent, 4 = bitangent
+void CustomModel::initNormalVAO()
+{
+    // Crear VBOs para tangentes y bitangentes
+    glGenBuffers(1, &m_tangentVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+    glBufferData(GL_ARRAY_BUFFER,
+                 m_tangents.size() * sizeof(float),
+                 m_tangents.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, &m_bitangentVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_bitangentVBO);
+    glBufferData(GL_ARRAY_BUFFER,
+                 m_bitangents.size() * sizeof(float),
+                 m_bitangents.data(), GL_STATIC_DRAW);
+
+    // Crear VAO para el normal shader
+    glGenVertexArrays(1, &m_normalVAO);
+    glBindVertexArray(m_normalVAO);
+
+    // loc 0: posiciones
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // loc 1: normales
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO[2]);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+
+    // loc 2: texcoords
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO[1]);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(2);
+
+    // loc 3: tangentes
+    glBindBuffer(GL_ARRAY_BUFFER, m_tangentVBO);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glEnableVertexAttribArray(3);
+
+    // loc 4: bitangentes
+    glBindBuffer(GL_ARRAY_BUFFER, m_bitangentVBO);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glEnableVertexAttribArray(4);
+
+    // EBO compartido con el VAO principal
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+
+    glBindVertexArray(0);
+}
+
+// Carga el mapa de normales y prepara el VAO de normal mapping.
+void CustomModel::loadNormalMap(const char *path)
+{
+#ifdef HAVE_SOIL2
+    m_normalMapID = SOIL_load_OGL_texture(
+        path,
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        0);
+
+    if (m_normalMapID == 0)
+    {
+        std::cerr << "  [NormalMap] No se pudo cargar: " << path << "\n";
+        return;
+    }
+    std::cout << "  [NormalMap] Cargado: " << path << "\n\n";
+    computeTangents();
+    initNormalVAO();
+#endif
+}
+
+// Renderiza con el shader de normal mapping.
+void CustomModel::renderNormal(ShaderProgram *normalShader, const Matrix4D &view, const Matrix4D &projection)
+{
+    if (m_normalVAO == 0 || m_normalMapID == 0)
+    {
+        // Fallback al shader principal
+        render(view, projection);
+        return;
+    }
+
+    normalShader->use();
+    normalShader->setMat4("model",      m_model);
+    normalShader->setMat4("view",       view);
+    normalShader->setMat4("projection", projection);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_textureID);
+    normalShader->setTextureUnit("samp", 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_normalMapID);
+    normalShader->setTextureUnit("normalMap", 1);
+
+    glBindVertexArray(m_normalVAO);
+    glDrawElements(GL_TRIANGLES, m_numIndices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
