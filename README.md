@@ -19,6 +19,7 @@
 | # | Título | Carpeta |
 |:-:|--------|:-------:|
 | 1 | Proyecto de Medio Semestre | [Proyecto 01/](Proyectos/1.%20Proyecto%20GC%20de%20Medio%20Semestre/) |
+| 2 | Proyecto Fin de Semestre | [Proyecto 02/](Proyectos/2.%20Proyecto%20Fin%20de%20Semestre/) |
 
 ## Prácticas
 
